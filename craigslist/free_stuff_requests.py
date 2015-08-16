@@ -1,3 +1,7 @@
+'''
+scrapes the free section of the specified
+craigslist. single-threaded, non-recursive
+'''
 import argparse
 import time
 

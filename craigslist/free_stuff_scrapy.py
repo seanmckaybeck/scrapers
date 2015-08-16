@@ -1,3 +1,10 @@
+'''
+parses the free section of baltimore's
+craigslist using scrapy. all data scraped
+is saved to mongodb. this is not a
+recursive scraper: it only gets the first page
+and extracts the relevant sections
+'''
 import pymongo
 from scrapy.spiders import Spider
 from scrapy.item import Item, Field

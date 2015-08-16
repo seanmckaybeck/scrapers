@@ -1,3 +1,11 @@
+'''
+Scrapes the free section of specified craigslist
+using requests and beautifulsoup4. it only grabs
+the first page and all of its elements. a threadexecutor
+is used to try and speed up the process of extracting
+all of the relevant data, but testing shows that
+the single-thread version is faster.
+'''
 import argparse
 import concurrent.futures
 from multiprocessing import cpu_count

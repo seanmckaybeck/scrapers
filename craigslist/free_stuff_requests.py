@@ -18,10 +18,11 @@ def get_args():
     return parser.parse_args()
 
 
-def extract_entry_data(entry):
+def extract_entry_data(entry, url):
     link = entry.select('a')[0]['href']
     submitted = entry.select('time')[0]['datetime']
     title = entry.find_all('a', class_='hdrlnk')[0].text
+    title = '{}{}'.format(url, title)
     return {'link': link, 'submitted': submitted, 'title': title}
 
 

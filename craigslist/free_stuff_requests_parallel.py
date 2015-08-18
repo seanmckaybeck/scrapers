@@ -24,10 +24,11 @@ def get_args():
     return parser.parse_args()
 
 
-def extract_entry_data(entry):
+def extract_entry_data(entry, url):
     link = entry.select('a')[0]['href']
     submitted = entry.select('time')[0]['datetime']
     title = entry.find_all('a', class_='hdrlnk')[0].text
+    title = '{}{}'.format(url, title)
     return {'link': link, 'submitted': submitted, 'title': title}
 
 
@@ -50,7 +51,7 @@ def parse(url):
     data = []
     start = time.time()
     with concurrent.futures.ThreadPoolExecutor(max_workers=count*2) as executor:
-        res = [executor.submit(extract_entry_data, entry) for entry in entries]
+        res = [executor.submit(extract_entry_data, entry, url) for entry in entries]
         for future in concurrent.futures.as_completed(res):
             try:
                 entry = future.result()

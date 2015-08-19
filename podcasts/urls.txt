@@ -1,0 +1,13 @@
+defensive_security http://www.defensivesecurity.org/feed/podcast
+owasp_24_7 http://feeds.soundcloud.com/users/soundcloud:users:63303345/sounds.rss
+talk_python_to_me http://talkpython.fm/episodes/rss
+crypto_gram http://dhenage.libsyn.com/rss
+data_stories http://datastori.es/feed/mp3/
+defensive_security http://www.defensivesecurity.org/feed/podcast
+network_security http://mckeay.libsyn.com/rss
+oreilly_data_show http://feeds.podtrac.com/IOJSwQcdEBcg
+talking_machines http://www.thetalkingmachines.com/blog/?format=RSS
+prairie_home_companion http://americanpublicmedia.publicradio.org/podcasts/xml/prairie_home_companion/news_from_lake_wobegon
+linear_digressions https://feeds.feedburner.com/udacity-linear-digressions
+partially_derivative https://feeds.feedburner.com/PartiallyDerivative?format=xml
+data_skeptic http://dataskeptic.com/feed.rss

@@ -24,6 +24,9 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 
 def get_args():
+    '''
+    gets the command line args
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', type=str, default='urls.txt', help='The file containing the Podcast feed URLs to parse')
     parser.add_argument('-e', type=str, required=True, help='Email address to send from')
@@ -34,6 +37,9 @@ def get_args():
 
 
 def get_urls(url_file):
+    '''
+    extracts name:url pairs from the supplied file
+    '''
     with open(url_file) as f:
         l = [line.strip() for line in f.readlines()]
         d = []
@@ -47,6 +53,9 @@ def get_urls(url_file):
 
 
 def get_db():
+    '''
+    returns an instance of the mongodb client
+    '''
     client = pymongo.MongoClient()
     db = client['podcasts']
     logging.debug('Got the database instance')
@@ -81,6 +90,10 @@ def parse(url):
 
 
 def split_work(urls):
+    '''
+    returns list of each of ret values from parse()
+    uses multiprocessing pool to parallelize the process
+    '''
     cpus = multiprocessing.cpu_count() * 2
     pool = multiprocessing.Pool(processes=cpus)
     pool_outputs = pool.map(parse, urls)
@@ -91,6 +104,10 @@ def split_work(urls):
 
 
 def save(d, db):
+    '''
+    saves the given name:list of dicts to mongodb
+    adds entry to db if it isnt already there
+    '''
     name = list(d.keys())[0]
     collection = db[name]
     added = []
@@ -103,6 +120,9 @@ def save(d, db):
 
 
 def save_to_db(podcast_dicts, db):
+    '''
+    calls save on each set of extracted url info
+    '''
     res = []
     for d in podcast_dicts:
         res.append(save(d, db))
@@ -111,6 +131,9 @@ def save_to_db(podcast_dicts, db):
 
 
 def email(podcasts, server, user, password, to):
+    '''
+    emails specified user when new podcasts are found
+    '''
     body = ''
     for d in podcasts:
         name = list(d.keys())[0]

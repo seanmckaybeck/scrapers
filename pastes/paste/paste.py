@@ -20,13 +20,14 @@ class Site(object):
     """
     Base class for all paste sites to inherit from.
     """
-    def __init__(self, url_base, url_archive, paste_tag, target_patterns):
+    def __init__(self, url_base, url_archive, paste_tag, target_patterns, paste):
         self.url_base = url_base
         self.url_archive = url_archive
         self.paste_tag = paste_tag
         self.target_patterns = target_patterns
         self.headers = {'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36' \
                         '(KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36'}
+        self.paste = paste
 
     def get(self):
         """
@@ -42,19 +43,19 @@ class Site(object):
         soup = BeautifulSoup(req.text, 'lxml')
         links = soup.find_all(self.paste_tag)
         LOGGER.debug('Got %d links from page', len(links))
-        return [urljoin(self.url_base, link.a.get('href')) for link in links]
+        return [self.paste(urljoin(self.url_base, link.a.get('href'))) for link in links]
 
-    def get_paste(self, url):
+    def get_paste(self, paste):
         """
         Gets the supplied paste url.
 
         Returns list of tuples of matches in paste.
         """
-        req = requests.get(url, headers=self.headers)
+        req = requests.get(paste.url, headers=self.headers)
         LOGGER.debug('Got response for paste')
         while req.status_code != 200:
             LOGGER.error('Response was not 200. Trying again...')
-            req = requests.get(url)
+            req = requests.get(paste.url)
         found = []
         for name, pattern in self.target_patterns:
             LOGGER.debug('Trying pattern: %s', pattern)
@@ -63,6 +64,43 @@ class Site(object):
             if matches:
                 found.append((name, len(matches)))
         return found
+
+
+class Paste(object):
+    """
+    Base class for pastes. Parses paste ID
+    from supplied URL
+    """
+    def __init__(self, url):
+        _id = url.split('/')[-1]
+        self._id = _id
+
+
+class PastebinPaste(Paste):
+    """
+    Paste for Pastebin
+    """
+    def __init__(self, url):
+        super().__init__(url)
+        self.url = 'http://pastebin.com/raw.php?i={}'.format(self._id)
+
+
+class PastiePaste(Paste):
+    """
+    Paste for Pastie
+    """
+    def __init__(self, url):
+        super().__init__(url)
+        self.url = 'http://pastie.org/pastes/{}/text'.format(self._id)
+
+
+class SlexyPaste(Paste):
+    """
+    Paste for Slexy
+    """
+    def __init__(self, url):
+        super().__init__(url)
+        self.url = 'http://slexy.org/raw/{}'.format(self._id)
 
 
 class Pastebin(Site):
@@ -74,7 +112,8 @@ class Pastebin(Site):
         self.url_archive = '/archive'
         self.paste_tag = lambda tag: tag.name == 'td' and tag.a and \
                          '/archive/' not in tag.a['href'] and tag.a['href'][1:]
-        super().__init__(self.url_base, self.url_archive, self.paste_tag, target_patterns)
+        super().__init__(self.url_base, self.url_archive, self.paste_tag, target_patterns,
+                         PastebinPaste)
 
 
 class Pastie(Site):
@@ -85,7 +124,8 @@ class Pastie(Site):
         self.url_base = 'http://pastie.org'
         self.url_archive = '/pastes'
         self.paste_tag = lambda tag: tag.name == 'p' and tag.a and self.url_base in tag.a['href']
-        super().__init__(self.url_base, self.url_archive, self.paste_tag, target_patterns)
+        super().__init__(self.url_base, self.url_archive, self.paste_tag, target_patterns,
+                         PastiePaste)
 
 
 class Slexy(Site):
@@ -96,4 +136,5 @@ class Slexy(Site):
         self.url_base = 'http://slexy.org'
         self.url_archive = '/recent'
         self.paste_tag = lambda tag: tag.name == 'td' and tag.a and '/view/' in tag.a['href']
-        super().__init__(self.url_base, self.url_archive, self.paste_tag, target_patterns)
+        super().__init__(self.url_base, self.url_archive, self.paste_tag, target_patterns,
+                         SlexyPaste)

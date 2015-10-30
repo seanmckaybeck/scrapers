@@ -44,8 +44,28 @@ async def parse_year(client, url, _id):
     '''
     content = await get_page(client, url)
     soup = BeautifulSoup(content, 'lxml')
-    print(url)
-    # TODO actually parse stuff
+    tables = soup.find_all('table')
+    for table in tables:
+        rows = table.find_all('tr', class_='datarow')
+        for row in rows:
+            tds = row.find_all('td')
+            date = tds[0].text.strip()
+            against = tds[1].text.strip()
+            try:
+                against_id = re.search(r'\d+', tds[1].a.get('href'))
+                against_id = against_id.group(0)
+            except AttributeError:
+                against_id = ''
+            score = tds[2].text.strip()
+            try:
+                boxscore = tds[2].a.get('href')
+            except AttributeError:
+                boxscore = ''
+            type_ = tds[3].text.strip()
+            # TODO save to db
+            s = '------------------\n{}\n{}\n{}\n{}\n-------------'.format(url, date, against_id, score)
+            print(s)
+
 
 async def parse_team(client, _id):
     '''
@@ -69,7 +89,8 @@ async def main(client):
     Main routine
     '''
     ids = get_teams()
-    chunks = [ids[i:i+NUM_TASKS] for i in range(0, len(ids), NUM_TASKS)]
+    # chunks = [ids[i:i+NUM_TASKS] for i in range(0, len(ids), NUM_TASKS)]
+    chunks = [ids[i::NUM_TASKS] for i in range(NUM_TASKS)]
     workers = [asyncio.ensure_future(work(client, chunk)) for chunk in chunks]
     await asyncio.gather(*workers)
 

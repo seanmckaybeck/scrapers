@@ -1,7 +1,7 @@
 username: yourusername
 password: yourpassword
 subreddit: targetsubreddit
-sleep: 300
+sleep: 30
 mailgun: your_private_mailgun_api_key
 domain: your_mailgun_domain
 emails:

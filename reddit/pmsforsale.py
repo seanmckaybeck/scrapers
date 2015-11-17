@@ -54,7 +54,7 @@ def get_post_date(post):
     Converts the post's created time string to a datetime object
     Returns datetime object
     '''
-    return datetime.datetime.fromtimestamp(post.created)
+    return datetime.datetime.fromtimestamp(post.created_utc)
 
 
 def check_posts(sub, last_time, config):
@@ -90,11 +90,11 @@ def main():
     logging.debug('Getting subreddit %s', config['subreddit'])
     sub = reddit.get_subreddit(config['subreddit'])
     # set last check date to a day earlier
-    last_time = datetime.datetime.now() - datetime.timedelta(days=1)
+    last_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     while True:
         logging.debug('Checking posts...')
         check_posts(sub, last_time, config)
-        last_time = datetime.datetime.now()
+        last_time = datetime.datetime.utcnow()
         logging.debug('Sleeping for %d seconds...', config['sleep'])
         time.sleep(config['sleep'])
 

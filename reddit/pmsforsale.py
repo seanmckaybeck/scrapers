@@ -92,11 +92,14 @@ def main():
     # set last check date to a day earlier
     last_time = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     while True:
-        logging.debug('Checking posts...')
-        check_posts(sub, last_time, config)
-        last_time = datetime.datetime.utcnow()
-        logging.debug('Sleeping for %d seconds...', config['sleep'])
-        time.sleep(config['sleep'])
+        try:
+            logging.debug('Checking posts...')
+            check_posts(sub, last_time, config)
+            last_time = datetime.datetime.utcnow()
+            logging.debug('Sleeping for %d seconds...', config['sleep'])
+            time.sleep(config['sleep'])
+        except Exception as exc:
+            logging.error('Got an error:\n{}'.format(exc))
 
 
 if __name__ == '__main__':

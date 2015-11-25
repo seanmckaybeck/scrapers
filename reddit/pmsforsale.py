@@ -26,7 +26,8 @@ def get_args():
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', type=str, default='config.yml', help='Config file')
-    parser.add_argument('-v', action='count', default=0, help='Change logging verbosity')
+    parser.add_argument('-v', action='count', default=0,
+                        help='Change logging verbosity by providing multiple v\'s')
     return parser.parse_args()
 
 
